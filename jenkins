@@ -3,37 +3,40 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/yashroxalways/my-python-app.git'
+                // Checkout code from Git (Replace with your actual Git URL)
+                git url: 'https://github.com/yashroxalways/my-python-app.git'
             }
         }
-        stage('Install Dependencies') {
+        stage('Setup Environment') {
             steps {
-                sh 'npm install'
+                echo "Creating virtual environment..."
+                // Replace with the correct Python executable path
+                bat 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m venv venv'
+                
+                echo "Activating virtual environment..."
+                bat 'call venv\\Scripts\\activate.bat'
+                
+                echo "Installing dependencies..."
+                bat 'venv\\Scripts\\pip.exe install -r requirements.txt'
             }
         }
         stage('Run Tests') {
             steps {
-                sh 'npm test'
+                echo "Running tests..."
+                bat 'venv\\Scripts\\python.exe -m pytest'
             }
         }
-        stage('Build') {
+        stage('Deploy') {
             steps {
-                sh 'npm run build'
-            }
-        }
-        stage('Deploy to Local Server') {
-            steps {
-                // This will copy the build to the local server directory
-                sh 'cp -r dist/* /path/to/local/http/server/'
+                echo "Deploying application..."
+                // Add your deployment commands here
             }
         }
     }
     post {
-        success {
-            echo 'Build succeeded!'
-        }
-        failure {
-            echo 'Build failed!'
+        always {
+            echo "Cleaning up workspace..."
+            cleanWs()
         }
     }
 }
