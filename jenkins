@@ -1,69 +1,39 @@
-pipeline{
-    agent any 
-
-    environment {
-        PYTHON_ENV = 'venv'     // Virtual Environment for Python
-        
-    }
+pipeline {
+    agent any
     stages {
-        // Stage 1: Clone the repository
-        stage('Checkout'){
-            steps{
-                echo 'Cloneing repository...'
-                git branch: 'main', url: 'https://github.com/vikram-neerugatti/my-python-app.git'
-            }
-        }
-
-        // Stage 2: Set up the Python enviroment
-
-        stage('Setup Environment') {
+        stage('Checkout') {
             steps {
-                echo 'Setting up python virtula enviroment...'
-                sh '''
-                python3 -m venv ${PYTHON_ENV}      # create a virtual environment
-                source ${PYTHON_ENV}/bin/activate   # Activate the virtual environment
-                pip install -r requirements.txt   # Install dependencies
-                '''
+                git branch: 'main', url: 'https://github.com/username/repo.git'
             }
         }
-
-        // Stage 3: Run the tests
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
         stage('Run Tests') {
             steps {
-                echo 'Running unit tests...'
-                sh  '''
-                source ${PYTHON_ENV}/vin/activate
-                pytest tests/
-                '''
+                sh 'npm test'
             }
-            
         }
-
-        // Stage 4: Deploy (this could be to a local http server, for example)
-        stage('Deploy') {
+        stage('Build') {
             steps {
-                echo 'Deploying application...'
-                // In this example, we'll simulate deployment by copying the code to a server directory
-                sh '''
-                cp -r * /path/to/local/http/server/root/  # Copy the app to the deployment directory
-                '''
+                sh 'npm run build'
             }
         }
-
-
-        
+        stage('Deploy to Local Server') {
+            steps {
+                // This will copy the build to the local server directory
+                sh 'cp -r dist/* /path/to/local/http/server/'
+            }
+        }
     }
-}
-
-post {
-    always {
-        echo 'Cleaning up workspace...'
-        cleanWs()     // Clean the workspace after the pipeline execution
-    }
-    success {
-        echo 'Pipeline completed successfully!'
-    }
-    failure {
-        echo 'Pipeline failed!'
+    post {
+        success {
+            echo 'Build succeeded!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
     }
 }
