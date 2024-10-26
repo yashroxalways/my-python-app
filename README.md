@@ -1,0 +1,4 @@
+-form a python code and save as .py
+-add a requirements.txt
+-upload this to github repository
+-now add this to jenkins using github repository link
